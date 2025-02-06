@@ -50,3 +50,9 @@ extension InlineNode {
     }
   }
 }
+
+extension InlineNode: Identifiable {
+    var id: UUID {
+        UUID()
+    }
+}

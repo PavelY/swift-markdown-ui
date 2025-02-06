@@ -17,7 +17,7 @@ struct InlineText: View {
 
   var body: some View {
     TextStyleAttributesReader { attributes in
-      self.inlines.renderText(
+      self.inlines.renderMarkdownText(
         baseURL: self.baseURL,
         textStyles: .init(
           code: self.theme.code,
