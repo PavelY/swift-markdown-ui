@@ -2,7 +2,36 @@ import SwiftUI
 
 extension [InlineNode] {
     @ViewBuilder
-    func renderMarkdownText(
+    func render(
+        baseURL: URL?,
+        textStyles: InlineTextStyles,
+        images: [String: Image],
+        softBreakMode: SoftBreak.Mode,
+        attributes: AttributeContainer
+    ) -> some View {
+        ForEach(lines(), id: \.self) {
+            if case .link = $0.first {
+                $0.renderMarkdownText(
+                    baseURL: baseURL,
+                    textStyles: textStyles,
+                    images: images,
+                    softBreakMode: softBreakMode,
+                    attributes: attributes
+                )
+            } else {
+                $0.renderText(
+                    baseURL: baseURL,
+                    textStyles: textStyles,
+                    images: images,
+                    softBreakMode: softBreakMode,
+                    attributes: attributes
+                )
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func renderMarkdownText(
         baseURL: URL?,
         textStyles: InlineTextStyles,
         images: [String: Image],
@@ -17,6 +46,30 @@ extension [InlineNode] {
             attributes: attributes
         )
         renderer.render(self)
+    }
+
+    private func lines() -> [[InlineNode]] {
+        var lines = [[InlineNode]]()
+        var nodesLine: [InlineNode]?
+        self.forEach {
+            if case .link = $0 {
+                if nodesLine != nil {
+                    lines.append(nodesLine!)
+                    nodesLine = nil
+                }
+                lines.append([$0])
+            } else if nodesLine == nil {
+                nodesLine = [$0]
+            } else {
+                nodesLine?.append($0)
+            }
+        }
+
+        if nodesLine != nil {
+            lines.append(nodesLine!)
+        }
+
+        return lines
     }
 }
 
