@@ -24,6 +24,7 @@ public struct MarkdownText: UIViewRepresentable {
         view.isEditable = false
         view.isScrollEnabled = false
         view.contentInset = .zero
+        view.backgroundColor = .clear
         view.configure(with: viewModel)
         return view
     }
