@@ -3,6 +3,8 @@ import UIKit
 
 public struct MarkdownTextVM {
     let text: NSAttributedString
+    let textStyle: TextStyle
+    let attributes: AttributeContainer
 }
 
 public struct MarkdownText: UIViewRepresentable {
@@ -34,6 +36,8 @@ public struct MarkdownText: UIViewRepresentable {
 public final class MarkdownTextView: UITextView {
     func configure(with vm: MarkdownTextVM) {
         self.attributedText = vm.text
+        self.linkTextAttributes = vm.nsAttributes
+        self.textStorage.setAttributes(vm.nsAttributes, range: vm.text.fullRange)
 //        invalidateIntrinsicContentSize()
     }
 
@@ -54,4 +58,38 @@ public final class MarkdownTextView: UITextView {
 //
 //        return CGSize(width: width, height: height)
 //    }
+}
+
+private extension NSAttributedString {
+    var fullRange: NSRange {
+        .init(location: 0, length: string.count)
+    }
+}
+
+private extension MarkdownTextVM {
+    var nsAttributes: [NSAttributedString.Key: Any]? {
+        var attributes = [NSAttributedString.Key: Any]()
+
+        self.text.enumerateAttribute(.link, in: self.text.fullRange) { value, _, _ in
+            if let value {
+                attributes[.link] = value
+            }
+        }
+
+        if
+            case .custom(let name) = self.attributes.fontProperties?.family,
+            let size = self.attributes.fontProperties?.size
+        {
+            attributes[.font] = UIFont(name: name, size: size)
+        }
+
+        var container = AttributeContainer()
+        self.textStyle._collectAttributes(in: &container)
+        if let color = container.foregroundColor {
+            attributes[.foregroundColor] = UIColor(color)
+            attributes[.strokeColor] = UIColor(color)
+        }
+
+        return attributes
+    }
 }

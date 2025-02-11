@@ -176,6 +176,12 @@ struct MarkdownTextInlineRenderer {
             attributes: self.attributes
         )
 
-        return MarkdownText(.init(text: NSAttributedString(text)))
+        return MarkdownText(
+            .init(
+                text: NSAttributedString(text),
+                textStyle: textStyles.link,
+                attributes: attributes
+            )
+        )
     }
 }
