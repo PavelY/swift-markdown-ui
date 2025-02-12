@@ -1,26 +1,22 @@
 import SwiftUI
 import UIKit
 
-public struct MarkdownTextVM {
+public struct InlineLinkVM {
     let text: NSAttributedString
     let textStyle: TextStyle
     let attributes: AttributeContainer
 }
 
-public struct MarkdownText: UIViewRepresentable {
+public struct InlineLinkView: UIViewRepresentable {
 
-    public let viewModel: MarkdownTextVM
+    public let viewModel: InlineLinkVM
 
-    public init(_ viewModel: MarkdownTextVM) {
+    public init(_ viewModel: InlineLinkVM) {
         self.viewModel = viewModel
     }
 
-    public func makeUIView(context: Context) -> MarkdownTextView {
+    public func makeUIView(context: Context) -> InlineLinkTextView {
         let view = UIViewType()
-        view.setContentHuggingPriority(.defaultHigh, for: .vertical)
-        view.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-        view.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-        view.setContentCompressionResistancePriority(.required, for: .vertical)
         view.isEditable = false
         view.isScrollEnabled = false
         view.contentInset = .zero
@@ -29,36 +25,38 @@ public struct MarkdownText: UIViewRepresentable {
         return view
     }
 
-    public func updateUIView(_ uiView: MarkdownTextView, context: Context) {
+    public func updateUIView(_ uiView: InlineLinkTextView, context: Context) {
         uiView.configure(with: viewModel)
     }
 }
 
-public final class MarkdownTextView: UITextView {
-    func configure(with vm: MarkdownTextVM) {
+public final class InlineLinkTextView: UITextView {
+    func configure(with vm: InlineLinkVM) {
         self.attributedText = vm.text
         self.linkTextAttributes = vm.nsAttributes
         self.textStorage.setAttributes(vm.nsAttributes, range: vm.text.fullRange)
-//        invalidateIntrinsicContentSize()
+        self.textContainer.lineBreakMode = .byWordWrapping
     }
 
-//    public override var intrinsicContentSize: CGSize {
-//        let height = attributedText.boundingRect(
-//            with: CGSize(width: bounds.width, height: .greatestFiniteMagnitude),
-//            options: [.usesLineFragmentOrigin, .usesFontLeading],
-//            context: nil
-//        ).size.height
-//
-//        let width = attributedText.boundingRect(
-//            with: CGSize(width: .greatestFiniteMagnitude, height: height),
-//            options: [.usesLineFragmentOrigin, .usesFontLeading],
-//            context: nil
-//        ).size.height
-//
-//        print("[MRKDN]: bounds.width= \(bounds.width), width= \(width), height= \(height), text= \(attributedText.string)")
-//
-//        return CGSize(width: width, height: height)
-//    }
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+        if !self.bounds.size.equalTo(self.intrinsicContentSize) {
+            invalidateIntrinsicContentSize()
+        }
+    }
+
+    public override var intrinsicContentSize: CGSize {
+        let superIntrinsic = super.intrinsicContentSize
+
+        let width = self.bounds.width
+        let size = attributedText.boundingRect(
+            with: CGSize(width: width, height: .greatestFiniteMagnitude),
+            options: [.usesLineFragmentOrigin],
+            context: nil
+        ).size
+        let height = size.height + textContainerInset.top + textContainerInset.bottom + 5
+        return CGSize(width: width, height: height)
+    }
 }
 
 private extension NSAttributedString {
@@ -67,7 +65,7 @@ private extension NSAttributedString {
     }
 }
 
-private extension MarkdownTextVM {
+private extension InlineLinkVM {
     var nsAttributes: [NSAttributedString.Key: Any]? {
         var attributes = [NSAttributedString.Key: Any]()
 

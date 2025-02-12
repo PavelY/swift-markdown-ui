@@ -176,7 +176,7 @@ struct MarkdownTextInlineRenderer {
             attributes: self.attributes
         )
 
-        return MarkdownText(
+        return InlineLinkView(
             .init(
                 text: NSAttributedString(text),
                 textStyle: textStyles.link,
