@@ -10,6 +10,11 @@ extension EnvironmentValues {
     get { self[ImageBaseURLKey.self] }
     set { self[ImageBaseURLKey.self] = newValue }
   }
+
+    var isStreaming: Bool {
+        get { self[IsStreamingKey.self] }
+        set { self[IsStreamingKey.self] = newValue }
+    }
 }
 
 private struct BaseURLKey: EnvironmentKey {
@@ -18,4 +23,8 @@ private struct BaseURLKey: EnvironmentKey {
 
 private struct ImageBaseURLKey: EnvironmentKey {
   static var defaultValue: URL? = nil
+}
+
+private struct IsStreamingKey: EnvironmentKey {
+    static var defaultValue: Bool = false
 }

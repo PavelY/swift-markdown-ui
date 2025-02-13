@@ -6,6 +6,7 @@ struct InlineText: View {
   @Environment(\.imageBaseURL) private var imageBaseURL
   @Environment(\.softBreakMode) private var softBreakMode
   @Environment(\.theme) private var theme
+    @Environment(\.isStreaming) private var isStreaming
 
   @State private var inlineImages: [String: Image] = [:]
 
@@ -17,19 +18,35 @@ struct InlineText: View {
 
   var body: some View {
     TextStyleAttributesReader { attributes in
-      self.inlines.render(
-        baseURL: self.baseURL,
-        textStyles: .init(
-          code: self.theme.code,
-          emphasis: self.theme.emphasis,
-          strong: self.theme.strong,
-          strikethrough: self.theme.strikethrough,
-          link: self.theme.link
-        ),
-        images: self.inlineImages,
-        softBreakMode: self.softBreakMode,
-        attributes: attributes
-      )
+        if isStreaming {
+            self.inlines.renderText(
+              baseURL: self.baseURL,
+              textStyles: .init(
+                code: self.theme.code,
+                emphasis: self.theme.emphasis,
+                strong: self.theme.strong,
+                strikethrough: self.theme.strikethrough,
+                link: self.theme.link
+              ),
+              images: self.inlineImages,
+              softBreakMode: self.softBreakMode,
+              attributes: attributes
+            )
+        } else {
+            self.inlines.render(
+              baseURL: self.baseURL,
+              textStyles: .init(
+                code: self.theme.code,
+                emphasis: self.theme.emphasis,
+                strong: self.theme.strong,
+                strikethrough: self.theme.strikethrough,
+                link: self.theme.link
+              ),
+              images: self.inlineImages,
+              softBreakMode: self.softBreakMode,
+              attributes: attributes
+            )
+        }
     }
     .task(id: self.inlines) {
       self.inlineImages = (try? await self.loadInlineImages()) ?? [:]
