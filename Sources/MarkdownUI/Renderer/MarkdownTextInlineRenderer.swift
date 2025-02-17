@@ -9,9 +9,9 @@ extension [InlineNode] {
         softBreakMode: SoftBreak.Mode,
         attributes: AttributeContainer
     ) -> some View {
-        ForEach(lines(), id: \.self) {
-            if case .link = $0.first {
-                $0.renderMarkdownText(
+        ForEach(lines(), id: \.self) { nodes in
+            if case .link = nodes.first {
+                nodes.renderMarkdownText(
                     baseURL: baseURL,
                     textStyles: textStyles,
                     images: images,
@@ -19,7 +19,7 @@ extension [InlineNode] {
                     attributes: attributes
                 )
             } else {
-                $0.renderText(
+                nodes.renderText(
                     baseURL: baseURL,
                     textStyles: textStyles,
                     images: images,
@@ -176,11 +176,11 @@ struct MarkdownTextInlineRenderer {
             attributes: self.attributes
         )
 
-        return InlineLinkView(
+        return InlineTextView(
             .init(
-                text: NSAttributedString(text),
-                textStyle: textStyles.link,
-                attributes: attributes
+                text: NSAttributedString(text)
+//                textStyle: textStyles.link,
+//                attributes: attributes
             )
         )
     }

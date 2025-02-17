@@ -18,8 +18,22 @@ struct InlineText: View {
 
   var body: some View {
     TextStyleAttributesReader { attributes in
-        if isStreaming {
-            self.inlines.renderText(
+//        if isStreaming {
+//            self.inlines.renderText(
+//              baseURL: self.baseURL,
+//              textStyles: .init(
+//                code: self.theme.code,
+//                emphasis: self.theme.emphasis,
+//                strong: self.theme.strong,
+//                strikethrough: self.theme.strikethrough,
+//                link: self.theme.link
+//              ),
+//              images: self.inlineImages,
+//              softBreakMode: self.softBreakMode,
+//              attributes: attributes
+//            )
+//        } else {
+            self.inlines.renderTextView(
               baseURL: self.baseURL,
               textStyles: .init(
                 code: self.theme.code,
@@ -32,21 +46,7 @@ struct InlineText: View {
               softBreakMode: self.softBreakMode,
               attributes: attributes
             )
-        } else {
-            self.inlines.render(
-              baseURL: self.baseURL,
-              textStyles: .init(
-                code: self.theme.code,
-                emphasis: self.theme.emphasis,
-                strong: self.theme.strong,
-                strikethrough: self.theme.strikethrough,
-                link: self.theme.link
-              ),
-              images: self.inlineImages,
-              softBreakMode: self.softBreakMode,
-              attributes: attributes
-            )
-        }
+//        }
     }
     .task(id: self.inlines) {
       self.inlineImages = (try? await self.loadInlineImages()) ?? [:]
