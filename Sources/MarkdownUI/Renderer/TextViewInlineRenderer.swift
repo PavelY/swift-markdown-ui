@@ -18,13 +18,28 @@ extension Sequence where Element == InlineNode {
     renderer.render(self)
     return renderer.result
   }
+
+    var containsLinks: Bool {
+        self.contains(where: {
+            switch $0 {
+            case .link:
+                true
+            case .emphasis(let children), .strong(let children), .strikethrough(let children):
+                children.containsLinks
+            default:
+                false
+            }
+        })
+    }
 }
 
 private struct TextViewInlineRenderer {
     var result: InlineTextView {
         InlineTextView(
             .init(
-                text: attributedString
+                text: attributedString,
+                textStyles: textStyles,
+                attributes: attributes
             )
         )
     }

@@ -3,8 +3,8 @@ import UIKit
 
 public struct InlineTextVM {
     let text: NSAttributedString
-//    let textStyle: TextStyle
-//    let attributes: AttributeContainer
+    let textStyles: InlineTextStyles
+    let attributes: AttributeContainer
 }
 
 public struct InlineTextView: UIViewRepresentable {
@@ -32,10 +32,11 @@ public struct InlineTextView: UIViewRepresentable {
 
 public final class InlineUITextView: UITextView {
     func configure(with vm: InlineTextVM) {
-        self.attributedText = vm.text
-//        self.linkTextAttributes = vm.nsAttributes
-//        self.textStorage.setAttributes(vm.nsAttributes, range: vm.text.fullRange)
+        self.attributedText = nil
+        self.typingAttributes = vm.typingAttributes
+        self.linkTextAttributes = vm.linkAttributes
         self.textContainer.lineBreakMode = .byWordWrapping
+        self.insertAttributedText(vm.text)
     }
 
     public override func layoutSubviews() {
@@ -65,30 +66,45 @@ private extension NSAttributedString {
     }
 }
 
-//private extension InlineTextVM {
-//    var nsAttributes: [NSAttributedString.Key: Any]? {
-//        var attributes = [NSAttributedString.Key: Any]()
-//
-//        self.text.enumerateAttribute(.link, in: self.text.fullRange) { value, _, _ in
-//            if let value {
-//                attributes[.link] = value
-//            }
-//        }
-//
-//        if
-//            case .custom(let name) = self.attributes.fontProperties?.family,
-//            let size = self.attributes.fontProperties?.size
-//        {
-//            attributes[.font] = UIFont(name: name, size: size)
-//        }
-//
-//        var container = AttributeContainer()
-//        self.textStyle._collectAttributes(in: &container)
-//        if let color = container.foregroundColor {
-//            attributes[.foregroundColor] = UIColor(color)
-//            attributes[.strokeColor] = UIColor(color)
-//        }
-//
-//        return attributes
-//    }
-//}
+private extension InlineTextVM {
+    var linkAttributes: [NSAttributedString.Key: Any] {
+        var attributes = [NSAttributedString.Key: Any]()
+
+        var container = AttributeContainer()
+        self.textStyles.link._collectAttributes(in: &container)
+        if let color = container.foregroundColor {
+            attributes[.foregroundColor] = UIColor(color)
+            attributes[.strokeColor] = UIColor(color)
+        }
+        if let font = self.font {
+            attributes[.font] = font
+        }
+
+        return attributes
+    }
+
+    var typingAttributes: [NSAttributedString.Key: Any] {
+        var attributes = [NSAttributedString.Key: Any]()
+
+        var container = AttributeContainer()
+        self.textStyles.text._collectAttributes(in: &container)
+        if let color = container.foregroundColor {
+            attributes[.foregroundColor] = UIColor(color)
+        }
+
+        if let font = self.font {
+            attributes[.font] = font
+        }
+        return attributes
+    }
+
+    var font: UIFont? {
+        if
+            case .custom(let name) = self.attributes.fontProperties?.family,
+            let size = self.attributes.fontProperties?.size
+        {
+            return UIFont(name: name, size: size)
+        }
+        return nil
+    }
+}
