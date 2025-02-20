@@ -26,7 +26,13 @@ public struct InlineTextView: UIViewRepresentable {
     }
 
     public func updateUIView(_ uiView: InlineUITextView, context: Context) {
+        print("updateUIView")
         uiView.configure(with: viewModel)
+    }
+
+    @available(iOS 16.0, *)
+    public func sizeThatFits(_ proposal: ProposedViewSize, uiView: InlineUITextView, context: Context) -> CGSize? {
+        uiView.size(for: proposal.width ?? 0)
     }
 }
 
@@ -39,17 +45,7 @@ public final class InlineUITextView: UITextView {
         self.insertAttributedText(vm.text)
     }
 
-    public override func layoutSubviews() {
-        super.layoutSubviews()
-        if !self.bounds.size.equalTo(self.intrinsicContentSize) {
-            invalidateIntrinsicContentSize()
-        }
-    }
-
-    public override var intrinsicContentSize: CGSize {
-        let superIntrinsic = super.intrinsicContentSize
-
-        let width = self.bounds.width
+    func size(for width: CGFloat) -> CGSize {
         let size = attributedText.boundingRect(
             with: CGSize(width: width, height: .greatestFiniteMagnitude),
             options: [.usesLineFragmentOrigin],
