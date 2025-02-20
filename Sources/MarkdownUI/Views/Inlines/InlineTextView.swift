@@ -26,7 +26,6 @@ public struct InlineTextView: UIViewRepresentable {
     }
 
     public func updateUIView(_ uiView: InlineUITextView, context: Context) {
-        print("updateUIView")
         uiView.configure(with: viewModel)
     }
 
